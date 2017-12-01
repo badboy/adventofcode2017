@@ -4,24 +4,19 @@ use std::fs::File;
 fn captcha(input: &str) -> u32 {
     let input = input.trim();
     let len = input.len();
-    let mut chars = input.chars().map(|c| c.to_digit(10).unwrap());
     assert!(len > 1);
+    let chars = input
+        .chars()
+        .cycle()
+        .map(|c| c.to_digit(10).unwrap())
+        .take(len + 1)
+        .collect::<Vec<_>>();
 
-    let mut sum = 0;
-    let first_val : u32 = chars.next().unwrap();
-    let mut last_val = first_val;
-    for c in chars {
-        if last_val == c {
-            sum += last_val;
-        }
-        last_val = c;
-    }
-
-    if last_val == first_val {
-        sum += last_val;
-    }
-
-    sum
+    chars.windows(2).fold(0, |acc, vals| if vals[0] == vals[1] {
+        acc + vals[0]
+    } else {
+        acc
+    })
 }
 
 fn wrap_offset(idx: usize, offset: usize, len: usize) -> usize {
