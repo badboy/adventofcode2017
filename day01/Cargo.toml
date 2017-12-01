@@ -1,0 +1,10 @@
+[package]
+name = "day01"
+version = "0.1.0"
+authors = ["Jan-Erik Rediger <janerik@fnordig.de>"]
+
+[[bin]]
+name = "day01"
+path = "main.rs"
+
+[dependencies]
