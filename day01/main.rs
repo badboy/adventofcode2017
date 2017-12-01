@@ -4,14 +4,13 @@ use std::fs::File;
 fn captcha(input: &str) -> u32 {
     let input = input.trim();
     let len = input.len();
-    let mut chars = input.chars();
+    let mut chars = input.chars().map(|c| c.to_digit(10).unwrap());
     assert!(len > 1);
 
     let mut sum = 0;
-    let first_val : u32 = chars.next().unwrap().to_digit(10).unwrap();
+    let first_val : u32 = chars.next().unwrap();
     let mut last_val = first_val;
     for c in chars {
-        let c = c.to_digit(10).unwrap();
         if last_val == c {
             sum += last_val;
         }
@@ -32,14 +31,13 @@ fn wrap_offset(idx: usize, offset: usize, len: usize) -> usize {
 fn captcha2(input: &str) -> u32 {
     let input = input.trim();
     let len = input.len();
-    let chars : Vec<_> = input.chars().collect();
+    let chars : Vec<_> = input.chars().map(|c| c.to_digit(10).unwrap()).collect();
     assert!(len > 1);
     let mid = len/2;
 
     let mut sum = 0;
-    for (i,c) in chars.iter().enumerate() {
-        let c = c.to_digit(10).unwrap();
-        let next = chars[wrap_offset(i, mid, len)].to_digit(10).unwrap();
+    for (i,&c) in chars.iter().enumerate() {
+        let next = chars[wrap_offset(i, mid, len)];
         if c == next {
             sum += c;
         }
