@@ -20,18 +20,18 @@ fn captcha(input: &str) -> u32 {
 }
 
 fn wrap_offset(idx: usize, offset: usize, len: usize) -> usize {
-    (idx+offset) % len
+    (idx + offset) % len
 }
 
 fn captcha2(input: &str) -> u32 {
     let input = input.trim();
     let len = input.len();
-    let chars : Vec<_> = input.chars().map(|c| c.to_digit(10).unwrap()).collect();
+    let chars: Vec<_> = input.chars().map(|c| c.to_digit(10).unwrap()).collect();
     assert!(len > 1);
-    let mid = len/2;
+    let mid = len / 2;
 
     let mut sum = 0;
-    for (i,&c) in chars.iter().enumerate() {
+    for (i, &c) in chars.iter().enumerate() {
         let next = chars[wrap_offset(i, mid, len)];
         if c == next {
             sum += c;
