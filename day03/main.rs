@@ -34,6 +34,30 @@ struct Spiral {
     width: usize,
 }
 
+fn around(data: &[usize], width: usize, (inx,iny): (usize, usize)) -> Vec<usize> {
+    let mut vals = Vec::new();
+
+    let min_x = inx.saturating_sub(1);
+    let max_x = inx + 1;
+    let min_y = iny.saturating_sub(1);
+    let may_y = iny + 1;
+
+    for y in min_y..(may_y+1) {
+        for x in min_x..(max_x+1) {
+            if x == inx && y == iny {
+                continue;
+            }
+            if x >= width || y >= width {
+                continue;
+            }
+            vals.push(data[coords_to_offset((x,y), width)])
+        }
+    }
+
+    vals
+}
+
+
 impl Spiral {
     fn new(max: usize) -> Spiral {
         let root = ((max as f32).sqrt()) as usize + 1;
@@ -53,7 +77,16 @@ impl Spiral {
         let mut movement = Right(1);
 
         for i in 0..realmax {
-            let val = i+1;
+            let val = if i == 0 {
+                1
+            } else {
+                let ar = around(&spiral, root, pos);
+                ar.iter().sum()
+            };
+            if val > max {
+                println!("New value: {}", val);
+                break;
+            }
             spiral[coords_to_offset(pos, root)] = val;
 
             let (x, y) = pos;
@@ -107,6 +140,10 @@ impl Spiral {
         }
     }
 
+    fn mid(&self) -> (usize, usize) {
+        let middle = self.data.len() / 2;
+        offset_to_coords(middle, self.width)
+    }
 
     fn find(&self, n: usize) -> (usize, usize) {
         let pos = self.data.iter().position(|&val| val == n).unwrap_or(0);
@@ -114,8 +151,7 @@ impl Spiral {
     }
 
     fn distance_to_center(&self, (x,y): (usize, usize)) -> usize {
-        let middle = self.data.len() / 2;
-        let midpos = offset_to_coords(middle, self.width);
+        let midpos = self.mid();
 
         ((midpos.0 as isize - x as isize).abs() + (midpos.1 as isize - y as isize).abs()) as usize
     }
