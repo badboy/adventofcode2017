@@ -1,17 +1,24 @@
 use std::io::prelude::*;
 use std::fs::File;
-use std::collections::HashSet;
+use std::collections::HashMap;
+use std::collections::hash_map::Entry::*;
 
-fn redistribute(mut banks: Vec<u32>) -> u32 {
-    let mut seen: HashSet<Vec<u32>> = HashSet::new();
+fn redistribute(mut banks: Vec<u32>) -> (u32, u32) {
+    let mut seen: HashMap<Vec<u32>, u32> = HashMap::new();
     let len = banks.len();
     let mut cycles = 0;
+    let first_seen;
 
     loop {
-        if seen.contains(&banks) {
-            break;
+        match seen.entry(banks.clone()) {
+            Occupied(e) => {
+                first_seen = *e.get();
+                break;
+            }
+            Vacant(e) => {
+                e.insert(cycles);
+            }
         }
-        seen.insert(banks.clone());
 
         let mut max =
             banks.iter()
@@ -30,7 +37,7 @@ fn redistribute(mut banks: Vec<u32>) -> u32 {
         cycles += 1;
     }
 
-    cycles
+    (cycles-first_seen, cycles)
 }
 
 fn main() {
@@ -45,8 +52,9 @@ fn main() {
         .map(|elem| elem.parse::<u32>().unwrap())
         .collect::<Vec<_>>();
 
-    let n = redistribute(banks);
+    let (many, n) = redistribute(banks);
     println!("Redistribution steps: {}", n);
+    println!("How many? {}", many);
 }
 
 #[cfg(test)]
@@ -55,6 +63,6 @@ mod test {
 
     #[test]
     fn sample() {
-        assert_eq!(5, redistribute(vec![0,2,7,0]));
+        assert_eq!((4,5), redistribute(vec![0,2,7,0]));
     }
 }
